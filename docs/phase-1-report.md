@@ -17,9 +17,21 @@
 
 Automated tests generate their own PDF corpus and inject a deterministic encoder. They cover page association, token bounds, empty PDFs, duplicate ingestion, ranking, fresh-process reload, and recovery after index corruption or a SQLite rollback.
 
-## Acceptance gate
+## MiniLM smoke test
 
-- The full MiniLM CLI smoke test is pending. The automated suite uses a fixture encoder.
+On Windows with sentence-transformers 6.3.0, CPU MiniLM indexed two locally generated one-page PDFs. The first command downloaded the model to `data/model-cache`. The subsequent commands used the same cache with `HF_HUB_OFFLINE=1`.
+
+| Command | Result |
+| --- | --- |
+| `.\.venv\Scripts\papertrail.exe --data-dir data/smoke-library ingest data/smoke-input` | Two papers, one chunk each |
+| `.\.venv\Scripts\papertrail.exe --data-dir data/smoke-library search "Where did the orchid grow?"` | Correct page ranked first at 0.742 cosine similarity |
+| Repeat the ingest command | Both PDFs reported as duplicates |
+| `.\.venv\Scripts\papertrail.exe --data-dir data/smoke-library rebuild-index` | Two indexed chunks |
+| `.\.venv\Scripts\python.exe evaluation/evaluate.py data/smoke-questions.jsonl --data-dir data/smoke-library --split development` | Evaluator completed on one answerable and one unanswerable synthetic query |
+
+For the single answerable query, Recall@1, Recall@5, and MRR@5 were all 1.0. All four returned page references matched the source excerpts. Mean query time was 30.0 ms across the two queries, after model initialization. The unanswerable query's top cosine score was 0.241. These figures measure the synthetic smoke fixture only.
+
+## Acceptance gate
 
 - **PENDING USER VALIDATION** · Ingest at least two permitted research PDFs, repeat the search in a fresh process, verify cited pages, and re-ingest to confirm duplicate detection.
 - **PENDING USER VALIDATION** · Label 20–30 questions before tuning, reserve a holdout, and record Recall@1/5, MRR@5, page-reference accuracy, latency, and misses. No human-labeled retrieval scores are available.

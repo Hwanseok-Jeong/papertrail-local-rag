@@ -18,7 +18,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-On Linux or WSL, use `.venv/bin/python` and `.venv/bin/papertrail`. The embedding model downloads on first use. After it is cached, set `HF_HUB_OFFLINE=1` in your shell to run offline.
+On Linux or WSL, use `.venv/bin/python` and `.venv/bin/papertrail`. The embedding model downloads on first use. To store the model in this project's ignored data directory on PowerShell, set `$env:HF_HOME = Join-Path (Get-Location) 'data/model-cache'` before running the CLI. After the model is cached, set `HF_HUB_OFFLINE=1` in your shell to run offline.
 
 ## Phase 1 smoke test
 

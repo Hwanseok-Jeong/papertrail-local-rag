@@ -23,7 +23,10 @@ class MiniLM:
 
         self.name = name
         self.model = SentenceTransformer(name, device="cpu")
-        self.dimension = self.model.get_sentence_embedding_dimension()
+        if hasattr(self.model, "get_embedding_dimension"):
+            self.dimension = self.model.get_embedding_dimension()
+        else:
+            self.dimension = self.model.get_sentence_embedding_dimension()
         self.max_tokens = self.model.max_seq_length
 
     def offsets(self, text: str) -> Sequence[tuple[int, int]]:
