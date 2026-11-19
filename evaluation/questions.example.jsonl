@@ -1,0 +1,2 @@
+{"id":"example-1","query":"Where did the orchid grow?","split":"development","relevant":[{"file_sha256":"REPLACE_WITH_PDF_SHA256","page_number":3}]}
+{"id":"example-2","query":"What is the mass of Jupiter?","split":"holdout","relevant":[]}

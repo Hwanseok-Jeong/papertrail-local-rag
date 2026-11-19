@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "papertrail-local-rag"
+version = "0.1.0"
+description = "Local scientific PDF retrieval with page citations"
+requires-python = ">=3.11"
+dependencies = ["PyMuPDF", "numpy", "faiss-cpu"]
+
+[project.optional-dependencies]
+model = ["sentence-transformers"]
+test = ["pytest"]
+
+[project.scripts]
+papertrail = "papertrail.cli:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
