@@ -12,6 +12,7 @@ import pytest
 
 from papertrail.embeddings import split_page
 from papertrail.library import Library
+from papertrail.extraction import ExtractedChunk, ExtractedDocument
 
 
 class FixtureEncoder:
@@ -119,3 +120,50 @@ def test_recovers_index_ahead_of_sqlite(tmp_path, sample_pdf, monkeypatch):
     assert library.search("orchid") == []
     assert library.ingest(sample_pdf)["chunks"] == 2
     assert library.search("orchid")[0]["page_number"] == 3
+
+
+def test_docling_backend_stores_structure_and_embeds_context(
+    tmp_path, sample_pdf, monkeypatch
+):
+    document = ExtractedDocument(
+        title="Structured Study",
+        authors="A. Researcher",
+        chunks=(ExtractedChunk(
+            page_start=2,
+            page_end=3,
+            raw_text="The visible evidence passage.",
+            embedding_text="orchid Methods The visible evidence passage.",
+            headings=("Methods",),
+        ),),
+        empty_pages=(),
+    )
+    captured = {}
+
+    def fake_extract(path, content, encoder, length, **settings):
+        captured.update(settings)
+        return document
+
+    monkeypatch.setattr("papertrail.library.extract_docling", fake_extract)
+    library = Library(
+        tmp_path / "docling-data",
+        FixtureEncoder(),
+        length=6,
+        backend="docling",
+        docling_merge_peers=False,
+        docling_repeat_table_header=True,
+        docling_threads=2,
+    )
+    result = library.ingest(sample_pdf)
+    hit = library.search("orchid", 1)[0]
+
+    assert result["backend"] == "docling"
+    assert captured == {
+        "merge_peers": False,
+        "repeat_table_header": True,
+        "threads": 2,
+    }
+    assert hit["text"] == "The visible evidence passage."
+    assert hit["page_number"] == 2
+    assert hit["page_number_end"] == 3
+    assert hit["headings"] == ["Methods"]
+    assert hit["ingestion_backend"] == "docling"

@@ -64,6 +64,7 @@ For another library, pass its directory to `--data-dir`. Each accepted claim inc
 Phase reports and architecture notes:
 
 - [Phase 1 retrieval report](docs/phase-1-report.md)
+- [Docling ingestion experiment and parameters](docs/docling-ingestion.md)
 - [Phase 2 answer-generation report](docs/phase-2-report.md)
 - [Development phases and validation gates](docs/development-phases.md)
 - [Project specification](PaperTrail_project.md)

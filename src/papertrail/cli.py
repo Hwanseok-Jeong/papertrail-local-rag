@@ -23,6 +23,17 @@ def main() -> int:
     ingest.add_argument("folder", type=Path)
     ingest.add_argument("--chunk-tokens", type=int, default=os.getenv("CHUNK_TOKENS", "180"))
     ingest.add_argument("--overlap", type=int, default=os.getenv("CHUNK_OVERLAP_TOKENS", "30"))
+    ingest.add_argument(
+        "--backend", choices=("pymupdf", "docling"),
+        default=os.getenv("INGESTION_BACKEND", "pymupdf"),
+    )
+    ingest.add_argument(
+        "--docling-merge-peers", action=argparse.BooleanOptionalAction, default=True,
+    )
+    ingest.add_argument(
+        "--docling-repeat-table-header", action=argparse.BooleanOptionalAction, default=True,
+    )
+    ingest.add_argument("--docling-threads", type=int, default=4)
     search = commands.add_parser("search")
     search.add_argument("query")
     search.add_argument("--top-k", type=int, default=os.getenv("TOP_K", "5"))
@@ -52,6 +63,10 @@ def main() -> int:
         else:
             library.length = args.chunk_tokens
             library.overlap = args.overlap
+            library.backend = args.backend
+            library.docling_merge_peers = args.docling_merge_peers
+            library.docling_repeat_table_header = args.docling_repeat_table_header
+            library.docling_threads = args.docling_threads
             failed = False
             for path in paths:
                 try:
