@@ -49,4 +49,21 @@ The evaluator reports page-level Recall@1/5, MRR@5, mean query latency, misses, 
 
 ## Current scope
 
-Phase 1 covers retrieval-only CLI workflows. See [the Phase 1 report](docs/phase-1-report.md) and [the project specification](PaperTrail_project.md).
+Phase 2 adds local question answering. Install Ollama, start its local server, and select an installed model. For the two-paper development library, use:
+
+```powershell
+ollama pull qwen2.5:1.5b
+$env:OLLAMA_MODEL = 'qwen2.5:1.5b'
+$env:HF_HOME = Join-Path (Get-Location) 'data/model-cache'
+$env:HF_HUB_OFFLINE = '1'
+.\.venv\Scripts\papertrail.exe --data-dir data/block180/library ask "What were the inclusion criteria for the AIN3 cohort?"
+```
+
+For another library, pass its directory to `--data-dir`. Each accepted claim includes its source page and a verbatim evidence quote. Empty evidence, unknown source IDs and invalid quotes yield `insufficient_evidence`. Quote matching verifies attribution. Assess whether the passage supports the claim and answers the entire question during review. Configure the endpoint and request timeout with `OLLAMA_BASE_URL` and `OLLAMA_TIMEOUT` (seconds).
+
+Phase reports and architecture notes:
+
+- [Phase 1 retrieval report](docs/phase-1-report.md)
+- [Phase 2 answer-generation report](docs/phase-2-report.md)
+- [Development phases and validation gates](docs/development-phases.md)
+- [Project specification](PaperTrail_project.md)

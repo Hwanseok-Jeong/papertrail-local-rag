@@ -114,7 +114,9 @@ class Library:
                 title = (metadata.get("title") or "").strip() or path.stem
                 authors = (metadata.get("author") or "").strip() or None
                 for page_number, page in enumerate(pdf, start=1):
-                    page_text = re.sub(r"\s+", " ", page.get_text(sort=True)).strip()
+                    # Preserve the PDF's native text block order within each page.
+                    blocks = page.get_text("blocks", sort=False)
+                    page_text = " ".join(" ".join(b[4] for b in blocks if b[6] == 0).split())
                     passages = split_page(page_text, self.encoder, self.length, self.overlap)
                     if not passages:
                         empty_pages.append(page_number)

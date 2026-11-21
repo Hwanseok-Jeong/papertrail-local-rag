@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .embeddings import MiniLM
 from .library import Library
+from .rag import ask
 
 DEFAULT_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
@@ -26,6 +27,9 @@ def main() -> int:
     search.add_argument("query")
     search.add_argument("--top-k", type=int, default=os.getenv("TOP_K", "5"))
     commands.add_parser("rebuild-index")
+    answer = commands.add_parser("ask")
+    answer.add_argument("query")
+    answer.add_argument("--top-k", type=int, default=os.getenv("TOP_K", "5"))
     args = parser.parse_args()
 
     paths = []
@@ -35,13 +39,14 @@ def main() -> int:
         paths = sorted(p for p in args.folder.iterdir() if p.is_file() and p.suffix.lower() == ".pdf")
         if not paths:
             parser.error("no PDFs found in the folder")
-    if args.command == "search" and (not args.query.strip() or args.top_k < 1):
+    if args.command in {"search", "ask"} and (not args.query.strip() or args.top_k < 1):
         parser.error("search requires a nonblank query and positive top-k")
 
     try:
         library = Library(args.data_dir, MiniLM(args.model))
-        if args.command == "search":
-            print(json.dumps(library.search(args.query, args.top_k), indent=2))
+        if args.command in {"search", "ask"}:
+            hits = library.search(args.query, args.top_k)
+            print(json.dumps(ask(args.query, hits) if args.command == "ask" else hits, indent=2))
         elif args.command == "rebuild-index":
             print(json.dumps({"indexed_chunks": library.rebuild()}))
         else:

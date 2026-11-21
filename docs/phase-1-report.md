@@ -33,8 +33,8 @@ For the single answerable query, Recall@1, Recall@5, and MRR@5 were all 1.0. All
 
 ## Acceptance gate
 
-- **PENDING USER VALIDATION** · Ingest at least two permitted research PDFs, repeat the search in a fresh process, verify cited pages, and re-ingest to confirm duplicate detection.
-- **PENDING USER VALIDATION** · Label 20–30 questions before tuning, reserve a holdout, and record Recall@1/5, MRR@5, page-reference accuracy, latency, and misses. No human-labeled retrieval scores are available.
+- **REAL-PDF BASELINE RECORDED LOCALLY** · Two user-selected PDFs and the supplied gold CSV were evaluated. All 18 ranked lists reproduced after restart, both reimports were duplicates, and all 90 excerpts matched their cited PDF pages. Evidence-based Hit@1 was 2/18, Hit@5 was 7/18, and MRR@5 was 0.2056. Four unanswerable prompts were excluded. See the local report and inspection files under `data/phase1-validation/`.
+- **PENDING HOLDOUT VALIDATION** · The guide designates the supplied questions as a development set. Measure any retrieval changes on a separate holdout before drawing general conclusions.
 - Phase 2 requires explicit approval after Phase 1 review.
 
 ## Limitations
